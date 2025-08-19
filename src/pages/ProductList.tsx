@@ -12,15 +12,42 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [selectedSupplier, setSelectedSupplier] = useState("all");
+  const [priceMin, setPriceMin] = useState<number | "">("");
+  const [priceMax, setPriceMax] = useState<number | "">("");
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Filter and sort products based on criteria
-  const filterProducts = (category: string, search: string, sort: string) => {
+  const filterProducts = (
+    category: string,
+    search: string,
+    sort: string,
+    supplier: string,
+    minPrice: number | "",
+    maxPrice: number | ""
+  ) => {
     let filtered = [...allProducts];
 
     // Category filter
     if (category !== "all") {
       filtered = filtered.filter((product) => product.category === category);
+    }
+
+    // Supplier filter
+    if (supplier && supplier !== "all") {
+      filtered = filtered.filter((product) => product.supplier === supplier);
+    }
+
+    // Price range filter (based on basePrice)
+    if (minPrice !== "") {
+      filtered = filtered.filter(
+        (product) => product.basePrice >= (minPrice as number)
+      );
+    }
+    if (maxPrice !== "") {
+      filtered = filtered.filter(
+        (product) => product.basePrice <= (maxPrice as number)
+      );
     }
 
     // Search filter
@@ -61,7 +88,14 @@ const ProductList = () => {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    filterProducts(category, searchQuery, sortBy);
+    filterProducts(
+      category,
+      searchQuery,
+      sortBy,
+      selectedSupplier,
+      priceMin,
+      priceMax
+    );
   };
 
   const handleSearchChange = (search: string) => {
@@ -70,12 +104,68 @@ const ProductList = () => {
 
   // apply debounced search
   useMemo(() => {
-    filterProducts(selectedCategory, debouncedSearch, sortBy);
-  }, [selectedCategory, debouncedSearch, sortBy]);
+    filterProducts(
+      selectedCategory,
+      debouncedSearch,
+      sortBy,
+      selectedSupplier,
+      priceMin,
+      priceMax
+    );
+  }, [
+    selectedCategory,
+    debouncedSearch,
+    sortBy,
+    selectedSupplier,
+    priceMin,
+    priceMax,
+  ]);
 
   const handleSortChange = (sort: string) => {
     setSortBy(sort);
-    filterProducts(selectedCategory, searchQuery, sort);
+    filterProducts(
+      selectedCategory,
+      searchQuery,
+      sort,
+      selectedSupplier,
+      priceMin,
+      priceMax
+    );
+  };
+
+  const handleSupplierChange = (supplierId: string) => {
+    setSelectedSupplier(supplierId);
+    filterProducts(
+      selectedCategory,
+      searchQuery,
+      sortBy,
+      supplierId,
+      priceMin,
+      priceMax
+    );
+  };
+
+  const handlePriceChange = (min: number | "", max: number | "") => {
+    setPriceMin(min);
+    setPriceMax(max);
+    filterProducts(
+      selectedCategory,
+      searchQuery,
+      sortBy,
+      selectedSupplier,
+      min,
+      max
+    );
+  };
+
+  const handleClearFilters = () => {
+    setSelectedCategory("all");
+    setSelectedSupplier("all");
+    setSearchQuery("");
+    setSortBy("name");
+    setPriceMin("");
+    setPriceMax("");
+    filterProducts("all", "", "name", "all", "", "");
   };
 
   return (
@@ -109,9 +199,15 @@ const ProductList = () => {
           selectedCategory={selectedCategory}
           searchQuery={searchQuery}
           sortBy={sortBy}
+          selectedSupplier={selectedSupplier}
+          priceMin={priceMin}
+          priceMax={priceMax}
           onCategoryChange={handleCategoryChange}
           onSearchChange={handleSearchChange}
           onSortChange={handleSortChange}
+          onSupplierChange={handleSupplierChange}
+          onPriceChange={handlePriceChange}
+          onClearFilters={handleClearFilters}
         />
 
         {/* Products Grid */}
@@ -126,9 +222,7 @@ const ProductList = () => {
               <button
                 className="btn btn-primary cta1"
                 onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("all");
-                  filterProducts("all", "", sortBy);
+                  handleClearFilters();
                 }}
               >
                 Ver todos los productos
