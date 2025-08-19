@@ -4,10 +4,12 @@ import { useParams, Link } from "react-router-dom";
 import { products } from "../data/products";
 import { Product } from "../types/Product";
 import PricingCalculator from "../components/PricingCalculator";
+import { useCart } from "../context/CartContext";
 import "./ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
@@ -209,9 +211,11 @@ const ProductDetail = () => {
                     !canAddToCart ? "disabled" : ""
                   }`}
                   disabled={!canAddToCart}
-                  onClick={() =>
-                    alert("Función de agregar al carrito por implementar")
-                  }
+                  onClick={() => {
+                    if (!product) return;
+                    addToCart(product, quantity);
+                    alert("Producto agregado al carrito");
+                  }}
                 >
                   <span className="material-icons">shopping_cart</span>
                   {canAddToCart ? "Agregar al carrito" : "No disponible"}
