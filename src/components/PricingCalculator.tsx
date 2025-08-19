@@ -1,52 +1,68 @@
-import { useState } from 'react'
-import { Product } from '../types/Product'
-import './PricingCalculator.css'
+import { useState } from "react";
+import { Product } from "../types/Product";
+import "./PricingCalculator.css";
 
 interface PricingCalculatorProps {
-  product: Product
+  product: Product;
 }
 
 const PricingCalculator = ({ product }: PricingCalculatorProps) => {
-  const [quantity, setQuantity] = useState<number>(1)
-  const [selectedBreak, setSelectedBreak] = useState<number>(0)
+  const [quantity, setQuantity] = useState<number>(1);
 
-  // Calculate best pricing for quantity
+  // Calculate best pricing for quantity (choose lowest unit price among applicable breaks)
   const calculatePrice = (qty: number) => {
     if (!product.priceBreaks || product.priceBreaks.length === 0) {
-      return product.basePrice * qty
+      return product.basePrice * qty;
     }
 
-    // Find applicable price break
-    let applicableBreak = product.priceBreaks[0]
-    for (let i = 0; i < product.priceBreaks.length; i++) {
-      if (qty >= product.priceBreaks[i].minQty) {
-        applicableBreak = product.priceBreaks[i]
-      }
-    }
+    const sortedBreaks = [...product.priceBreaks].sort(
+      (a, b) => a.minQty - b.minQty
+    );
+    const applicableBreaks = sortedBreaks.filter((pb) => qty >= pb.minQty);
 
-    return applicableBreak.price * qty
-  }
+    // Always consider basePrice as a candidate in case breaks are not strictly cheaper
+    const bestUnitPrice = applicableBreaks.reduce(
+      (minPrice, pb) => Math.min(minPrice, pb.price),
+      product.basePrice
+    );
+
+    return bestUnitPrice * qty;
+  };
 
   // Calculate discount amount
   const getDiscount = (qty: number) => {
     if (!product.priceBreaks || product.priceBreaks.length === 0) {
-      return 0
+      return 0;
     }
 
-    const baseTotal = product.basePrice * qty
-    const discountedTotal = calculatePrice(qty)
-    
+    const baseTotal = product.basePrice * qty;
+    const discountedTotal = calculatePrice(qty);
+
     // Calculate savings percentage
-    return ((baseTotal - discountedTotal) / baseTotal) * 100
-  }
+    return ((baseTotal - discountedTotal) / baseTotal) * 100;
+  };
 
   // Format price display
   const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}` // Should be CLP formatting
-  }
+    return `$${price.toLocaleString()}`; // Should be CLP formatting
+  };
 
-  const currentPrice = calculatePrice(quantity)
-  const discountPercent = getDiscount(quantity)
+  const currentPrice = calculatePrice(quantity);
+
+  // Compute the best break index for highlighting based on original array order
+  const bestBreakIndex = (() => {
+    if (!product.priceBreaks || product.priceBreaks.length === 0) return -1;
+    let bestIdx = -1;
+    let bestUnitPrice = product.basePrice;
+    product.priceBreaks.forEach((pb, idx) => {
+      if (quantity >= pb.minQty && pb.price < bestUnitPrice) {
+        bestUnitPrice = pb.price;
+        bestIdx = idx;
+      }
+    });
+    return bestIdx;
+  })();
+  const discountPercent = getDiscount(quantity);
 
   return (
     <div className="pricing-calculator">
@@ -65,7 +81,9 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             <input
               type="number"
               value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              onChange={(e) =>
+                setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+              }
               className="quantity-input p1"
               min="1"
               max="10000"
@@ -80,16 +98,17 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             <h4 className="breaks-title p1-medium">Descuentos por volumen</h4>
             <div className="price-breaks">
               {product.priceBreaks.map((priceBreak, index) => {
-                const isActive = quantity >= priceBreak.minQty
-                const isSelected = selectedBreak === index
-                
+                const isActive = quantity >= priceBreak.minQty;
+                const isSelected = bestBreakIndex === index;
+
                 return (
-                  <div 
+                  <div
                     key={index}
-                    className={`price-break ${isActive ? 'active' : ''} ${isSelected ? 'selected' : ''}`}
+                    className={`price-break ${isActive ? "active" : ""} ${
+                      isSelected ? "selected" : ""
+                    }`}
                     onClick={() => {
-                      setSelectedBreak(index)
-                      setQuantity(priceBreak.minQty)
+                      setQuantity(priceBreak.minQty);
                     }}
                   >
                     <div className="break-quantity l1">
@@ -104,7 +123,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
                       </div>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -118,7 +137,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               {formatPrice(calculatePrice(quantity) / quantity)}
             </span>
           </div>
-          
+
           <div className="summary-row">
             <span className="summary-label p1">Cantidad:</span>
             <span className="summary-value p1-medium">{quantity} unidades</span>
@@ -143,22 +162,24 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
         {/* Actions */}
         <div className="calculator-actions">
-          <button 
+          <button
             className="btn btn-secondary cta1"
             onClick={() => {
               // Handle quote request
-              alert(`Cotización solicitada para ${quantity} unidades de ${product.name}`)
+              alert(
+                `Cotización solicitada para ${quantity} unidades de ${product.name}`
+              );
             }}
           >
             <span className="material-icons">email</span>
             Solicitar cotización oficial
           </button>
-          
-          <button 
+
+          <button
             className="btn btn-primary cta1"
             onClick={() => {
               // Add to cart functionality
-              alert('Función de agregar al carrito por implementar')
+              alert("Función de agregar al carrito por implementar");
             }}
           >
             <span className="material-icons">shopping_cart</span>
@@ -175,7 +196,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               <span className="info-detail l1">En pedidos sobre $50.000</span>
             </div>
           </div>
-          
+
           <div className="info-item">
             <span className="material-icons">schedule</span>
             <div className="info-content">
@@ -183,7 +204,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               <span className="info-detail l1">7-10 días hábiles</span>
             </div>
           </div>
-          
+
           <div className="info-item">
             <span className="material-icons">verified</span>
             <div className="info-content">
@@ -194,7 +215,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PricingCalculator
+export default PricingCalculator;
