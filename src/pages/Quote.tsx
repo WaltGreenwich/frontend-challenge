@@ -5,14 +5,13 @@ import type { Product } from "../types/Product";
 import { formatCLP } from "../utils/currency";
 import { clampQuantity, getQuantityBounds } from "../utils/quantity";
 import { getBestUnitPrice } from "../utils/pricing";
+import jsPDF from "jspdf";
 
 const Quote = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
 
   // Quote form state
-  const [companyName, setCompanyName] = useState("");
-  const [companyRut, setCompanyRut] = useState("");
   const [contactName, setContactName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -63,7 +62,7 @@ const Quote = () => {
   )}\nTotal: ${formatCLP(
     total,
     "code"
-  )}\n\nEmpresa: ${companyName}\nRUT: ${companyRut}\nContacto: ${contactName}\nEmail: ${email}\nTeléfono: ${phone}\n\nNotas: ${
+  )}\n\nNombre: ${contactName}\nEmail: ${email}\nTeléfono: ${phone}\n\nNotas: ${
     notes || "-"
   }\n`;
 
@@ -90,8 +89,48 @@ const Quote = () => {
     }
   }
 
-  const isFormValid =
-    companyName && companyRut && contactName && email.includes("@");
+  const isFormValid = contactName && email.includes("@") && phone;
+
+  function handleExportPDF() {
+    if (!product || !isFormValid) {
+      alert("Completa nombre, email y teléfono para generar el PDF.");
+      return;
+    }
+    const doc = new jsPDF();
+    let y = 20;
+    doc.setFontSize(18);
+    doc.text("Cotización SWAG", 14, y);
+    y += 10;
+    doc.setFontSize(12);
+    doc.text(`Producto: ${product.name}`, 14, y);
+    y += 7;
+    doc.text(`SKU: ${product.sku}`, 14, y);
+    y += 7;
+    doc.text(`Cantidad: ${quantity}`, 14, y);
+    y += 7;
+    doc.text(`Precio unitario: ${formatCLP(unitPrice, "code")}`, 14, y);
+    y += 7;
+    doc.text(`Total: ${formatCLP(total, "code")}`, 14, y);
+    y += 12;
+    doc.setFont("helvetica", "bold");
+    doc.text("Datos de contacto", 14, y);
+    doc.setFont("helvetica", "normal");
+    y += 8;
+    doc.text(`Nombre: ${contactName}`, 14, y);
+    y += 7;
+    doc.text(`Email: ${email}`, 14, y);
+    y += 7;
+    doc.text(`Teléfono: ${phone}`, 14, y);
+    y += 10;
+    if (notes) {
+      doc.text("Notas:", 14, y);
+      y += 7;
+      const split = doc.splitTextToSize(notes, 180);
+      doc.text(split, 14, y);
+    }
+    const safeSku = product.sku.replace(/[^a-z0-9_-]+/gi, "-");
+    doc.save(`cotizacion_${safeSku}_${Date.now()}.pdf`);
+  }
 
   return (
     <div className="product-detail-page">
@@ -126,41 +165,50 @@ const Quote = () => {
             </div>
 
             <div className="selection-group">
-              <h3 className="selection-title p1-medium">Datos de empresa</h3>
+              <h3 className="selection-title p1-medium">Datos de contacto</h3>
               <div className="price-range" style={{ display: "grid", gap: 8 }}>
                 <input
                   className="search-input p1"
-                  placeholder="Razón social"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                />
-                <input
-                  className="search-input p1"
-                  placeholder="RUT"
-                  value={companyRut}
-                  onChange={(e) => setCompanyRut(e.target.value)}
-                />
-                <input
-                  className="search-input p1"
-                  placeholder="Nombre de contacto"
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 8,
+                    padding: 10,
+                  }}
+                  placeholder="Nombre"
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                 />
                 <input
                   className="search-input p1"
-                  placeholder="Email de contacto"
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 8,
+                    padding: 10,
+                  }}
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
                   className="search-input p1"
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 8,
+                    padding: 10,
+                  }}
                   placeholder="Teléfono"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
                 <textarea
                   className="search-input p1"
-                  placeholder="Notas adicionales"
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 8,
+                    padding: 10,
+                    minHeight: 80,
+                  }}
+                  placeholder="Notas adicionales (opcional)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
@@ -238,6 +286,14 @@ const Quote = () => {
               >
                 <span className="material-icons">download</span>
                 Exportar resumen
+              </button>
+              <button
+                className="btn btn-primary cta1"
+                onClick={handleExportPDF}
+                disabled={!isFormValid}
+              >
+                <span className="material-icons">picture_as_pdf</span>
+                Generar PDF
               </button>
             </div>
           </div>
