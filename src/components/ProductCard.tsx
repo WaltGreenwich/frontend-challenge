@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Product } from "../types/Product";
 import { formatCLP } from "../utils/currency";
 import "./ProductCard.css";
@@ -8,6 +8,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const navigate = useNavigate();
   // Handle product status display
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -139,7 +140,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="btn btn-secondary l1"
             onClick={(e) => {
               e.preventDefault();
-              alert("Función de cotización por implementar");
+              navigate(`/quote/${product.id}`); // 👈 Usa `Maps` para ir a la página de cotización
             }}
           >
             <span className="material-icons">calculate</span>

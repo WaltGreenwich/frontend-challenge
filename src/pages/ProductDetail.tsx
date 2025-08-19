@@ -235,7 +235,7 @@ const ProductDetail = () => {
 
         {/* Pricing Calculator */}
         <div className="pricing-section">
-          <PricingCalculator product={product} />
+          <PricingCalculator product={product} canAddToCart={canAddToCart} />
         </div>
       </div>
     </div>

@@ -7,9 +7,13 @@ import "./PricingCalculator.css";
 
 interface PricingCalculatorProps {
   product: Product;
+  canAddToCart: boolean;
 }
 
-const PricingCalculator = ({ product }: PricingCalculatorProps) => {
+const PricingCalculator = ({
+  product,
+  canAddToCart,
+}: PricingCalculatorProps) => {
   const [quantity, setQuantity] = useState<number>(1);
   const { addToCart } = useCart();
 
@@ -180,6 +184,25 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           </button>
 
           <button
+            className={`btn btn-primary cta1 ${
+              !canAddToCart ? "disabled" : ""
+            }`}
+            onClick={() => {
+              if (!canAddToCart) {
+                return; // Si el botón está deshabilitado, no hagas nada
+              }
+              addToCart(product, quantity); // 👈 agrega al carrito
+              alert(
+                `${quantity} unidades de ${product.name} agregadas al carrito ✅`
+              );
+            }}
+            disabled={!canAddToCart} // 👈 Esta línea desactiva el botón
+          >
+            <span className="material-icons">shopping_cart</span>
+            {canAddToCart ? "Agregar al carrito" : "No disponible"}
+          </button>
+
+          {/* <button
             className="btn btn-primary cta1"
             onClick={() => {
               addToCart(product, quantity); // 👈 agrega al carrito
@@ -190,7 +213,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           >
             <span className="material-icons">shopping_cart</span>
             Agregar al carrito
-          </button>
+          </button> */}
         </div>
 
         {/* Additional Info */}
