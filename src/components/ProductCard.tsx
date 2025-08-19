@@ -30,7 +30,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   // Format price for display
   const formatPrice = (price: number) => {
-    return formatCLP(price);
+    return formatCLP(price, "code");
   };
 
   // Check stock availability

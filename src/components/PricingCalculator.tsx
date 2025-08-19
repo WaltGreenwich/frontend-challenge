@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Product } from "../types/Product";
 import { formatCLP } from "../utils/currency";
+import { clampQuantity, getQuantityBounds } from "../utils/quantity";
 import "./PricingCalculator.css";
 
 interface PricingCalculatorProps {
@@ -45,7 +46,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
   // Format price display
   const formatPrice = (price: number) => {
-    return formatCLP(price);
+    return formatCLP(price, "code");
   };
 
   const currentPrice = calculatePrice(quantity);
@@ -82,12 +83,12 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             <input
               type="number"
               value={quantity}
+              min={getQuantityBounds(product).min}
+              max={getQuantityBounds(product).max}
               onChange={(e) =>
-                setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                setQuantity(clampQuantity(product, parseInt(e.target.value)))
               }
               className="quantity-input p1"
-              min="1"
-              max="10000"
             />
             <span className="quantity-unit l1">unidades</span>
           </div>
