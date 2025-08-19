@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
 import Quote from "./pages/Quote";
+import CartPage from "./pages/CartPage";
 import "./App.css";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<ProductList />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/quote/:id" element={<Quote />} />
+          <Route path="/cart" element={<CartPage />} />
         </Routes>
       </main>
     </div>

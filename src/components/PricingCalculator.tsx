@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Product } from "../types/Product";
 import { formatCLP } from "../utils/currency";
 import { clampQuantity, getQuantityBounds } from "../utils/quantity";
+import { useCart } from "../context/CartContext";
 import "./PricingCalculator.css";
 
 interface PricingCalculatorProps {
@@ -10,6 +11,7 @@ interface PricingCalculatorProps {
 
 const PricingCalculator = ({ product }: PricingCalculatorProps) => {
   const [quantity, setQuantity] = useState<number>(1);
+  const { addToCart } = useCart();
 
   // Calculate best pricing for quantity (choose lowest unit price among applicable breaks)
   const calculatePrice = (qty: number) => {
@@ -180,8 +182,10 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           <button
             className="btn btn-primary cta1"
             onClick={() => {
-              // Add to cart functionality
-              alert("Función de agregar al carrito por implementar");
+              addToCart(product, quantity); // 👈 agrega al carrito
+              alert(
+                `${quantity} unidades de ${product.name} agregadas al carrito ✅`
+              );
             }}
           >
             <span className="material-icons">shopping_cart</span>

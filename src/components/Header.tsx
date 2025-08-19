@@ -22,13 +22,10 @@ const Header = () => {
               <span className="material-icons">home</span>
               Catálogo
             </Link>
-            <button
-              className="nav-link l1"
-              onClick={() => alert("Función de carrito por implementar")}
-            >
+            <Link to="/cart" className="nav-link l1">
               <span className="material-icons">shopping_cart</span>
               Carrito ({count})
-            </button>
+            </Link>
           </nav>
 
           {/* Actions */}
