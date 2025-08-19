@@ -36,10 +36,18 @@ const ProductList = () => {
     // Sorting logic
     switch (sort) {
       case "name":
+      case "name-asc":
         filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
+      case "name-desc":
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        break;
       case "price":
-        // Price sorting to implement
+      case "price-asc":
+        filtered.sort((a, b) => a.basePrice - b.basePrice);
+        break;
+      case "price-desc":
+        filtered.sort((a, b) => b.basePrice - a.basePrice);
         break;
       case "stock":
         filtered.sort((a, b) => b.stock - a.stock);
