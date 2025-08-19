@@ -34,14 +34,16 @@
 .cart-img-box {
   flex: 0 0 80px;
   height: 80px;
-  overflow: hidden;
+  display: flex; /* ✅ centrado horizontal */
+  align-items: center; /* ✅ centrado vertical */
+  justify-content: center; /* ✅ centrado horizontal */
   border-radius: 8px;
+  background: #f5f5f5;
 }
 
 .cart-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  font-size: 48px; /* ✅ tamaño del icono */
+  color: #999;
 }
 
 /* Info */
@@ -65,17 +67,23 @@
 }
 
 .cart-remove {
-  background: #ff4d4d;
+  background: #dc3545;
   color: #fff;
   border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+  font-weight: 500;
 }
 
 .cart-remove:hover {
-  background: #e60000;
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+.cart-remove:active {
+  transform: translateY(0);
 }
 
 /* Footer */
@@ -94,19 +102,44 @@
 }
 
 .cart-clear {
-  background: #333;
+  background: #6c757d; /* Gris profesional */
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+  font-weight: 500;
 }
 
 .cart-clear:hover {
-  background: #111;
+  background: #5a6268; /* Gris más oscuro al pasar el cursor */
+  transform: translateY(-2px);
 }
 
+.cart-clear:active {
+  transform: translateY(0);
+}
+
+.buy-btn {
+  background: #28a745; /* Verde de éxito y seguridad */
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+  font-weight: 600; /* Un poco más de peso a la fuente */
+}
+
+.buy-btn:hover {
+  background: #218838; /* Verde más oscuro al pasar el cursor */
+  transform: translateY(-2px);
+}
+
+.buy-btn:active {
+  transform: translateY(0);
+}
 /* Vacío */
 .empty {
   text-align: center;
