@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Product } from "../types/Product";
+import { formatCLP } from "../utils/currency";
 import "./PricingCalculator.css";
 
 interface PricingCalculatorProps {
@@ -44,7 +45,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
   // Format price display
   const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}`; // Should be CLP formatting
+    return formatCLP(price);
   };
 
   const currentPrice = calculatePrice(quantity);

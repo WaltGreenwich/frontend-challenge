@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Product } from "../types/Product";
+import { formatCLP } from "../utils/currency";
 import "./ProductCard.css";
 
 interface ProductCardProps {
@@ -29,7 +30,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   // Format price for display
   const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}`; // Missing currency and proper formatting
+    return formatCLP(price);
   };
 
   // Check stock availability
